@@ -22,6 +22,9 @@
 			.headerPadding {
 				padding:10px;
 			}
+			.resetBtn {
+				margin-top:20px;
+			}
 		</style>
 	</head>
 	<body>
@@ -29,7 +32,7 @@
 		<nav class="navbar navbar-default navbar-static-top">
 			<div class="container">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="#">Weather Time</a>
+					<a class="navbar-brand" href="/">Weather Time</a>
 				</div>
 				<div class="navbar-form navbar-right" role="location">
 					<form class="form-group" id="locationForm">
@@ -46,17 +49,18 @@
 
 		<div class="container">
 			<div class="row">
-				<div class="col-sm-6 col-sm-offset-3">
+				<div class="col-sm-6 col-sm-offset-3 text-center">
 					<div class="innerContainer">
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="roundedWithBackground">
 									<h4 class="title text-center headerPadding"></h1>
-									<div class="content text-center"></div>
+									<div class="content"></div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<button id="resetHomeLocationBtn" class="btn btn-default resetBtn" type="button">Reset Home Location</button>
 				</div>
 			</div>
 		</div>
@@ -338,8 +342,14 @@
 								self.refreshWeatherByIpAddress();
 							}
 						});
+						
+						$('#resetHomeLocationBtn').click(function(e) {
+							self.cookieManager.deleteCookie('myWeatherApp');
+							$('#locationModal').modal('show');
+						});
+						
 					};
-
+					
 					App.prototype.init = function() {
 						this.bindEvents();
 						var cookieValue = this.cookieManager.getCookie('myWeatherApp');
