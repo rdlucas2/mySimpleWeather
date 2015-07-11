@@ -298,7 +298,7 @@
 				App.prototype.init = function() {
 					var cookieValue = app.cookieManager.getCookie('myWeatherApp');
 					if(cookieValue) {
-						this.refreshWeatherByWoeId('cookieValue');
+						this.refreshWeatherByWoeId(cookieValue);
 					} else {
 						$('#locationModal').modal('show');
 					}
