@@ -102,7 +102,7 @@
 						else {
 							expires = "";
 						}
-						document.cookie = name + "=" + value + expires + "; path=/";
+						document.cookie = name + "=" + value + expires + "; Path=/;";
 					};
 
 					CookieManager.prototype.getCookie = function(c_name) {
