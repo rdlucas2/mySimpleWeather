@@ -53,10 +53,12 @@
 							<div class="col-sm-12">
 								<div class="roundedWithBackground">
 									<h4 class="title text-center headerPadding"></h1>
+									<div class="content text-center"></div>
 								</div>
 							</div>
 						</div>
 
+						<!--
 						<div class="row">
 							<div class="col-sm-8 col-sm-offset-2">
 								<p class="day0 text-center roundedWithBackground"></p>		
@@ -80,15 +82,66 @@
 								<p class="day4 text-center roundedWithBackground"></p>		
 							</div>
 						</div>
+						-->
 					</div>
 				</div>
 			</div>
 		</div>
+		
+		<div class="modal fade" id="locationModal">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Determine Location</h4>
+			  </div>
+				<div class="modal-body">
+					<p>Set your home location (uses cookies). If you do not enter a location, we'll use your IP address to get as close as we can.</p>
+					<label>Location:<input type="text" id="modalLocationInput" /></label>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Go!</button>
+				</div>
+			</div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->		
+		
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				var yahooBaseYqlUrl = 'https://query.yahooapis.com/v1/public/yql?q=';
+				
+				function CookieManager() {
+				}
+				
+				CookieManager.prototype.createCookie = function(name, value, days) {
+					var expires;
+					if (days) {
+						var date = new Date();
+						date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+						expires = "; expires=" + date.toGMTString();
+					}
+					else {
+						expires = "";
+					}
+					document.cookie = name + "=" + value + expires + "; path=/";				
+				};
+				
+				CookieManager.prototype.getCookie = function(c_name) {
+					if (document.cookie.length > 0) {
+						c_start = document.cookie.indexOf(c_name + "=");
+						if (c_start != -1) {
+							c_start = c_start + c_name.length + 1;
+							c_end = document.cookie.indexOf(";", c_start);
+							if (c_end == -1) {
+								c_end = document.cookie.length;
+							}
+							return unescape(document.cookie.substring(c_start, c_end));
+						}
+					}
+					return "";				
+				};
 				
 				function FlickrImages(yahooBaseYqlUrl) {
 					this.apiKey = '429cce0f83cf8b43f51a97d4d26360bb';
@@ -108,13 +161,15 @@
 				};
 				
 				FlickrImages.prototype.getBackgroundImagesWithText = function(text) {
-					var formattedText = text.replace(/ /g,"%20");
+					text = text.replace(/\//g, ' ');
+					var formattedText = encodeURIComponent(text); //text.replace(/ /g,"%20");
 					var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20text%3D%22" + formattedText + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 					var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
 					return $.get(getBackgroundUrl);
 				};
 				
 				FlickrImages.prototype.getBackgroundImagesWithTags = function(text) {
+					text = text.replace(/\//g, ' ');
 					var tags = this.generateQueryTagString(text);
 					var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20tags%3D%22" + tags + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 					var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
@@ -122,7 +177,8 @@
 				};
 				
 				FlickrImages.prototype.getBackgroundImagesWithTextAndTags = function(text) {
-					var formattedText = text.replace(/ /g,"%20");
+					text = text.replace(/\//g, ' ');
+					var formattedText = encodeURIComponent(text); //text.replace(/ /g,"%20");
 					var tags = this.generateQueryTagString(text);
 					var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.apiKey + "%22%20and%20text%3D%22" + formattedText + "%22%20and%20tags%3D%22" + tags + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 					var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
@@ -150,16 +206,24 @@
 				}
 				
 				YahooGeo.prototype.getWoeIdFromLocation = function(location) {
-					var formattedLocation = location.replace(/ /g,"%20");
+					location = location.replace(/\//g, ' ');
+					var formattedLocation = encodeURIComponent(location); //text.replace(/ /g,"%20");
 					var getGeoWoeIdQuery = "select%20*%20from%20geo.places%20where%20text%3D%22" + formattedLocation + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 					var getGeoWoeIdUrl = this.yahooBaseYqlUrl + getGeoWoeIdQuery;
 					return $.get(getGeoWoeIdUrl);
 				};
 				
-				function App(flickrImages, yahooWeather, yahooGeo) {
+				YahooGeo.prototype.getLocationFromLatAndLon = function (location) {
+					var getQuery = "select%20*%20from%20geo.placefinder%20where%20text%3D%22" + location + "%22%20and%20gflags%3D%22R%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+					var getUrl = this.yahooBaseYqlUrl + getQuery;
+					return $.get(getUrl);
+				};
+				
+				function App(flickrImages, yahooWeather, yahooGeo, cookieManager) {
 					this.flickrImages = flickrImages;
 					this.yahooWeather = yahooWeather;
 					this.yahooGeo = yahooGeo;
+					this.cookieManager = cookieManager;
 				}
 				
 				App.prototype.getRandomNumberBetween = function(lowerBound, upperBound) {
@@ -168,19 +232,7 @@
 				
 				App.prototype.displayWeather = function(weather) {
 					$('.title').html(weather.title);
-					for(var i = 0; i < weather.forecast.length; i++) {
-						$('.day' + i).html(
-							weather.forecast[i].day + 
-							' ' + 
-							weather.forecast[i].date + 
-							'<br>High:' + 
-							weather.forecast[i].high + 
-							'&#176; <br>Low:' + 
-							weather.forecast[i].low + 
-							'&#176; <br>' + 
-							weather.forecast[i].text
-						);
-					}
+					$('.content').html(weather.description);
 				};
 				
 				App.prototype.setFullWidthBackground = function(imageUrl) {
@@ -244,25 +296,20 @@
 				};
 				
 				App.prototype.init = function() {
-					//this.refreshWeather('15001');
-					this.refreshWeatherByWoeId('Aliquippa PA');
+					var cookieValue = app.cookieManager.getCookie('myWeatherApp');
+					if(cookieValue) {
+						this.refreshWeatherByWoeId('cookieValue');
+					} else {
+						$('#locationModal').modal('show');
+					}
 				};
 				
 				var flickrImages = new FlickrImages(yahooBaseYqlUrl);
 				var yahooWeather = new YahooWeather(yahooBaseYqlUrl);
 				var yahooGeo = new YahooGeo(yahooBaseYqlUrl);
-				var app = new App(flickrImages, yahooWeather, yahooGeo);
+				var cookieManager = new CookieManager();
+				var app = new App(flickrImages, yahooWeather, yahooGeo, cookieManager);
 				app.init();
-				
-				/*
-				$('#locationForm').submit(function(e) {
-					e.preventDefault();
-					var location = $('#location').val();
-					if(location) {
-						app.refreshWeather(location);
-					}
-				});
-				*/
 				
 				$('#locationForm').submit(function(e) {
 					e.preventDefault();
@@ -272,23 +319,36 @@
 					}
 				});
 				
-				//todo: if user shares location, use it - reverse geocode with yahoo, otherwise, use ipinfo (city, state)
-
-				//yql query:
-				/*
-					select%20*%20from%20geo.placefinder%20where%20text%3D%2239.9340%2C-74.8910%22%20and%20gflags%3D%22R%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=
-				*/
-				
-				$.get("http://ipinfo.io", function(response) {
-					console.log(response);
-				}, "jsonp");
-				
-				if (navigator.geolocation) {
-					navigator.geolocation.getCurrentPosition(function(position) {
-						console.log(position);
-					});
-				}
-
+				$('#locationModal').on('hide.bs.modal', function(e) {
+					var locationInputValue = $('#modalLocationInput').val();
+					if(locationInputValue) {
+						app.cookieManager.createCookie('myWeatherApp', locationInputValue, 365);
+						app.refreshWeatherByWoeId(locationInputValue);
+					} else {
+						$.get("http://ipinfo.io", function(response) {
+							var loc = response.loc;
+							$.when(app.yahooGeo.getLocationFromLatAndLon(loc))
+								.then(function(data) {
+									$.when(app.yahooWeather.getWeatherByWoeId(data.query.results.Result.woeid))
+										.then(function(r){
+											var weather = r.query.results.rss.channel.item;
+											app.displayWeather(weather);
+											$.when(app.flickrImages.getBackgroundImagesWithTextAndTags(weather.forecast[0].text))
+												.then(function(d) {
+													var imageUrls = $.grep(d.query.results.size, function(item) {
+														var lastSix = item.source.slice(-6);
+														return lastSix.indexOf('_') === -1;
+													});
+													var upperBound = imageUrls.length-1;
+													var randomInRange = app.getRandomNumberBetween(0, upperBound);
+													var imageUrl = imageUrls[randomInRange].source;
+													app.setFullWidthBackground(imageUrl);
+												});
+										});
+								});
+						}, "jsonp");
+					}
+				});
 			});
 		</script>
 	</body>
