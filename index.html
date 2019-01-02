@@ -212,7 +212,8 @@
 
 					App.prototype.displayWeather = function(weather) {
 						$('.title').html(weather.title);
-						$('.content').html(weather.description);
+						var summary = weather.description.replace(/Low:/g, ' Low:').replace('<![CDATA[', '').replace('\n]]>', '').replace('http://us.rd.yahoo.com/dailynews/rss/weather/Country__Country/*', '');
+						$('.content').html(summary);
 					};
 
 					App.prototype.setFullWidthBackground = function(imageUrl) {
