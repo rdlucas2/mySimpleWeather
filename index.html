@@ -135,24 +135,20 @@
                 return CookieManager;
             })();
 
-            var DataScienceToolkitApi = (function() {
-                function DataScienceToolkitApi() {
-                    this.baseUrl = 'http://www.datasciencetoolkit.org/';
+            var MapQuestApi = (function() {
+                function MapQuestApi(mapQuestApiKey) {
+                    this.mapQuestApiKey = mapQuestApiKey;
+                    this.baseUrl = 'https://open.mapquestapi.com/geocoding/v1/address?key=' + mapQuestApiKey;
                 }
 
-                DataScienceToolkitApi.prototype.LocationSearch = function(searchTerm) {
+                MapQuestApi.prototype.Search = function(searchTerm) {
                     searchTerm = searchTerm.toString().replace(/\//g, ' ');
                     var formattedText = searchTerm.replace(/ /g, "+"); //encodeURIComponent(searchTerm);
-                    var url = this.baseUrl + 'maps/api/geocode/jsonp?sensor=false&address=' + formattedText;
-                    return $.ajax({
-                        type: 'GET',
-                        crossDomain: true,
-                        dataType: 'jsonp',
-                        url: url
-                    });
+                    var url = this.baseUrl + '&location=' + formattedText;
+                    return $.get(url);
                 }
 
-                return DataScienceToolkitApi;
+                return MapQuestApi;
             })();
 
             var OpenWeatherApi = (function() {
@@ -188,10 +184,10 @@
             })();
 
             var App = (function() {
-                function App(openWeatherApi, flickrApi, dataScienceToolkitApi, cookieManager) {
+                function App(openWeatherApi, flickrApi, mapQuestApi, cookieManager) {
                     this.openWeatherApi = openWeatherApi;
                     this.flickrApi = flickrApi;
-                    this.dataScienceToolkitApi = dataScienceToolkitApi;
+                    this.mapQuestApi = mapQuestApi;
                     this.cookieManager = cookieManager;
                 }
 
@@ -299,11 +295,11 @@
                 App.prototype.refreshWeatherByLocation = function(location) {
                     var self = this;
                     async.waterfall([
-                        function(location, callback) {
-                            $.when(self.dataScienceToolkitApi.LocationSearch(location))
+                        function(callback) {
+                            $.when(self.mapQuestApi.Search(location))
                                 .then(function(data) {
-                                    var lat = data.results[0].geometry.location.lat;
-                                    var long = data.results[0].geometry.location.lng;
+                                    var lat = data.results[0].locations[0].latLng.lat;
+                                    var long = data.results[0].locations[0].latLng.lng;
                                     var location = {
                                         'lat': lat,
                                         'long': long
@@ -312,7 +308,7 @@
                                 });
                         },
 
-                        function(woeid, callback) {
+                        function(location, callback) {
                             self.refreshWeatherByLatLong(location);
                             callback(null, 'done');
                         }
@@ -366,14 +362,12 @@
 
             var flickrApiKey = '429cce0f83cf8b43f51a97d4d26360bb';
             var openWeatherMapApiKey = 'b6b5e3ce1bc6e096b11b918e7f5f9c02';
+            var mapQuestApiKey = 'fcTfgruXwA1n3QK48RuejddZgOpBlYkr';
             var cookieManager = new CookieManager();
             var openWeatherApi = new OpenWeatherApi(openWeatherMapApiKey);
             var flickrApi = new FlickrApi(flickrApiKey);
-            var dataScienceToolkitApi = new DataScienceToolkitApi();
-            dataScienceToolkitApi.LocationSearch(16066);
-            flickrApi.PhotoSearch('Partly Sunny');
-            openWeatherApi.CurrentByLatLong('40.6120', '-80.0649');
-            var app = new App(openWeatherApi, flickrApi, dataScienceToolkitApi, cookieManager);
+            var mapQuestApi = new MapQuestApi(mapQuestApiKey);
+            var app = new App(openWeatherApi, flickrApi, mapQuestApi, cookieManager);
             app.init();
         });
     </script>
