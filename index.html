@@ -1,377 +1,382 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="x-ua-compatible" content="ie=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Sample Weather App</title>
-		<meta name="description" content="">
-		<meta name="author" content="">
-		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-		<style type="text/css">
-			.roundedWithBackground {
-				border-radius: 10px;
-				background: rgba(0,0,0,0.5);
-				color:white;
-			}
-			.innerContainer {
-				border-radius: 10px;
-				background: rgba(255,255,255,0.5);
-				padding:15px;
-			}
-			.headerPadding {
-				padding:10px;
-			}
-			.resetBtn {
-				margin-top:20px;
-			}
-		</style>
-	</head>
-	<body>
-		<!-- Static navbar -->
-		<nav class="navbar navbar-default navbar-static-top">
-			<div class="container">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="/">Weather Time</a>
-				</div>
-				<div class="navbar-form navbar-right" role="location">
-					<form class="form-group" id="locationForm">
-						<div class="input-group">
-							<input type="text" id="location" class="form-control" placeholder="location">
-							<span class="input-group-btn">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sample Weather App</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        .roundedWithBackground {
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+        
+        .innerContainer {
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+        }
+        
+        .headerPadding {
+            padding: 10px;
+        }
+        
+        .resetBtn {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Weather Time</a>
+            </div>
+            <div class="navbar-form navbar-right" role="location">
+                <form class="form-group" id="locationForm">
+                    <div class="input-group">
+                        <input type="text" id="location" class="form-control" placeholder="location">
+                        <span class="input-group-btn">
 								<button class="btn btn-default" type="submit">Go!</button>
 							</span>
-						</div><!-- /input-group -->
-					</div>
-				</form>
-			</div>
-		</nav>
+                    </div>
+                    <!-- /input-group -->
+            </div>
+            </form>
+        </div>
+    </nav>
 
-		<div class="container">
-			<div class="row">
-				<div class="col-sm-6 col-sm-offset-3 text-center">
-					<div class="innerContainer">
-						<div class="row">
-							<div class="col-sm-12">
-								<div class="roundedWithBackground">
-									<h4 class="title text-center headerPadding"></h1>
-									<div class="content"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<button id="resetHomeLocationBtn" class="btn btn-default resetBtn" type="button">Reset Home Location</button>
-				</div>
-			</div>
-		</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3 text-center">
+                <div class="innerContainer">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="roundedWithBackground">
+                                <h4 class="title text-center headerPadding">
+                                    </h1>
+                                    <div class="content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="resetHomeLocationBtn" class="btn btn-default resetBtn" type="button">Reset Home Location</button>
+            </div>
+        </div>
+    </div>
 
-		<div class="modal fade" id="locationModal">
-		  <div class="modal-dialog">
-			<div class="modal-content">
-			  <div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Determine Location</h4>
-			  </div>
-				<div class="modal-body">
-					<p>Set your home location (uses cookies). If you do not enter a location, we'll use your IP address to get as close as we can.</p>
-					<label>Location:<input type="text" id="modalLocationInput" /></label>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Go!</button>
-				</div>
-			</div><!-- /.modal-content -->
-		  </div><!-- /.modal-dialog -->
-		</div><!-- /.modal -->
+    <div class="modal fade" id="locationModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Determine Location</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Set your home location (uses cookies). If you do not enter a location, we'll use your IP address to get as close as we can.</p>
+                    <label>Location:<input type="text" id="modalLocationInput" /></label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Go!</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
-		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.3.0/async.min.js"></script>
-		<script type="text/javascript">
-			$(document).ready(function(){
-				var CookieManager = (function () {
-					function CookieManager() {
-					}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.3.0/async.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var CookieManager = (function() {
+                function CookieManager() {}
 
-					CookieManager.prototype.createCookie = function(name, value, days) {
-						var expires;
-						if (days) {
-							var date = new Date();
-							date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-							expires = "; expires=" + date.toGMTString();
-						}
-						else {
-							expires = "";
-						}
-						document.cookie = name + "=" + value + expires + "; Path=/;";
-					};
+                CookieManager.prototype.createCookie = function(name, value, days) {
+                    var expires;
+                    if (days) {
+                        var date = new Date();
+                        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                        expires = "; expires=" + date.toGMTString();
+                    } else {
+                        expires = "";
+                    }
+                    document.cookie = name + "=" + value + expires + "; Path=/;";
+                };
 
-					CookieManager.prototype.getCookie = function(c_name) {
-						if (document.cookie.length > 0) {
-							c_start = document.cookie.indexOf(c_name + "=");
-							if (c_start != -1) {
-								c_start = c_start + c_name.length + 1;
-								c_end = document.cookie.indexOf(";", c_start);
-								if (c_end == -1) {
-									c_end = document.cookie.length;
-								}
-								return unescape(document.cookie.substring(c_start, c_end));
-							}
-						}
-						return "";
-					};
+                CookieManager.prototype.getCookie = function(c_name) {
+                    if (document.cookie.length > 0) {
+                        c_start = document.cookie.indexOf(c_name + "=");
+                        if (c_start != -1) {
+                            c_start = c_start + c_name.length + 1;
+                            c_end = document.cookie.indexOf(";", c_start);
+                            if (c_end == -1) {
+                                c_end = document.cookie.length;
+                            }
+                            return unescape(document.cookie.substring(c_start, c_end));
+                        }
+                    }
+                    return "";
+                };
 
-					CookieManager.prototype.deleteCookie = function(c_name) {
-						document.cookie = c_name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-					};
+                CookieManager.prototype.deleteCookie = function(c_name) {
+                    document.cookie = c_name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                };
 
-					return CookieManager;
-				})();
+                return CookieManager;
+            })();
 
-				var YahooData = (function () {
-					function YahooData(yahooBaseYqlUrl, flickrApiKey) {
-						this.flickrApiKey = flickrApiKey;
-						this.yahooBaseYqlUrl = yahooBaseYqlUrl;
-					}
+            var DataScienceToolkitApi = (function() {
+                function DataScienceToolkitApi() {
+                    this.baseUrl = 'http://www.datasciencetoolkit.org/';
+                }
 
-					YahooData.prototype.generateQueryTagString = function(text) {
-						var textArray = text.split(' ');
-						var tags = '';
-						for(var i = 0; i < textArray.length; i++) {
-							tags += textArray[i]
-							if(i !== textArray.length-1) {
-								tags += '%2C%20';
-							}
-						}
-						return tags;
-					};
+                DataScienceToolkitApi.prototype.LocationSearch = function(searchTerm) {
+                    searchTerm = searchTerm.toString().replace(/\//g, ' ');
+                    var formattedText = searchTerm.replace(/ /g, "+"); //encodeURIComponent(searchTerm);
+                    var url = this.baseUrl + 'maps/api/geocode/jsonp?sensor=false&address=' + formattedText;
+                    return $.ajax({
+                        type: 'GET',
+                        crossDomain: true,
+                        dataType: 'jsonp',
+                        url: url
+                    });
+                }
 
-					YahooData.prototype.getBackgroundImagesWithText = function(text) {
-						text = text.replace(/\//g, ' ');
-						var formattedText = encodeURIComponent(text); //text.replace(/ /g,"%20");
-						var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20text%3D%22" + formattedText + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
-						return $.get(getBackgroundUrl);
-					};
+                return DataScienceToolkitApi;
+            })();
 
-					YahooData.prototype.getBackgroundImagesWithTags = function(text) {
-						text = text.replace(/\//g, ' ');
-						var tags = this.generateQueryTagString(text);
-						var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20tags%3D%22" + tags + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
-						return $.get(getBackgroundUrl);
-					};
+            var OpenWeatherApi = (function() {
+                function OpenWeatherApi(openWeatherApiKey) {
+                    this.openWeatherApiKey = openWeatherApiKey;
+                    this.baseUrl = 'https://api.openweathermap.org/data/2.5/';
+                    this.apiSuffix = '&appid=' + this.openWeatherApiKey;
+                }
 
-					YahooData.prototype.getBackgroundImagesWithTextAndTags = function(text) {
-						text = text.replace(/\//g, ' ');
-						var formattedText = encodeURIComponent(text); //text.replace(/ /g,"%20");
-						var tags = this.generateQueryTagString(text);
-						var getBackgroundQuery= "select%20source%20from%20flickr.photos.sizes%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20photo_id%20in%20(select%20id%20from%20flickr.photos.search%20where%20api_key%3D%22" + this.flickrApiKey + "%22%20and%20text%3D%22" + formattedText + "%22%20and%20tags%3D%22" + tags + "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getBackgroundUrl = this.yahooBaseYqlUrl + getBackgroundQuery;
-						return $.get(getBackgroundUrl);
-					};
+                OpenWeatherApi.prototype.CurrentByLatLong = function(lat, long) {
+                    var url = this.baseUrl + 'weather?lat=' + lat + '&lon=' + long + this.apiSuffix;
+                    return $.get(url);
+                }
 
-					YahooData.prototype.getWeather = function(location) {
-						var getWeatherQuery = "select%20*%20from%20weather.forecast%20where%20location%20in%20(%20select%20uzip%20from%20geo.placefinder%20where%20text%3D%22" + location + "%22%20)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getWeatherUrl = this.yahooBaseYqlUrl + getWeatherQuery;
-						return $.get(getWeatherUrl);
-					};
+                return OpenWeatherApi;
+            })();
 
-					YahooData.prototype.getWeatherByWoeId = function(woeid) {
-						var getWeatherQuery = "select%20*%20from%20weather.forecast%20where%20woeid%20in%20(" + woeid + ")&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
-						//var getWeatherQuery = "select%20*%20from%20weather.woeid%20where%20w%3D%22" + woeid + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getWeatherUrl = this.yahooBaseYqlUrl + getWeatherQuery;
-						return $.get(getWeatherUrl);
-					};
+            var FlickrApi = (function() {
+                function FlickrApi(flickrApiKey) {
+                    this.flickrApiKey = flickrApiKey;
+                    this.baseUrl = 'https://api.flickr.com/services/rest/';
+                    this.apiSuffix = '&api_key=' + this.flickrApiKey;
+                }
 
-					YahooData.prototype.getWoeIdFromLocation = function(location) {
-						location = location.replace(/\//g, ' ');
-						var formattedLocation = encodeURIComponent(location); //text.replace(/ /g,"%20");
-						var getGeoWoeIdQuery = "select%20*%20from%20geo.places%20where%20text%3D%22" + formattedLocation + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getGeoWoeIdUrl = this.yahooBaseYqlUrl + getGeoWoeIdQuery;
-						return $.get(getGeoWoeIdUrl);
-					};
+                FlickrApi.prototype.PhotoSearch = function(searchTerm) {
+                    searchTerm = searchTerm.replace(/\//g, ' ');
+                    var formattedText = searchTerm.replace(/ /g, "+"); //encodeURIComponent(searchTerm);
+                    var url = this.baseUrl + '?method=flickr.photos.search&tags=' + formattedText + '&text=' + formattedText + '&format=json&nojsoncallback=1' + this.apiSuffix;
+                    return $.get(url);
+                }
 
-					YahooData.prototype.getLocationFromLatAndLon = function (location) {
-						var getQuery = "select%20*%20from%20geo.placefinder%20where%20text%3D%22" + location + "%22%20and%20gflags%3D%22R%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-						var getUrl = this.yahooBaseYqlUrl + getQuery;
-						return $.get(getUrl);
-					};
+                return FlickrApi;
+            })();
 
-					return YahooData;
-				})();
+            var App = (function() {
+                function App(openWeatherApi, flickrApi, dataScienceToolkitApi, cookieManager) {
+                    this.openWeatherApi = openWeatherApi;
+                    this.flickrApi = flickrApi;
+                    this.dataScienceToolkitApi = dataScienceToolkitApi;
+                    this.cookieManager = cookieManager;
+                }
 
-				var App = (function () {
-					function App(yahooData, cookieManager) {
-						this.yahooData = yahooData;
-						this.cookieManager = cookieManager;
-					}
+                App.prototype.getRandomNumberBetween = function(lowerBound, upperBound) {
+                    return Math.floor(Math.random() * ((upperBound - lowerBound) + 1) + lowerBound);
+                };
 
-					App.prototype.getRandomNumberBetween = function(lowerBound, upperBound) {
-						return Math.floor(Math.random() * ((upperBound-lowerBound)+1) + lowerBound);
-					};
+                App.prototype.displayWeather = function(weather) {
+                    $('.title').html(weather.title);
+                    var summary = JSON.stringify(weather);
+                    $('.content').html(summary);
+                };
 
-					App.prototype.displayWeather = function(weather) {
-						$('.title').html(weather.title);
-						var summary = weather.description.replace(/Low:/g, ' Low:').replace('<![CDATA[', '').replace('\n]]>', '').replace('http://us.rd.yahoo.com/dailynews/rss/weather/Country__Country/*', '');
-						$('.content').html(summary);
-					};
+                App.prototype.setFullWidthBackground = function(imageUrl) {
+                    $('body').css('background-image', 'url(' + imageUrl + ')');
+                    $('body').css('background-repeat', 'no-repeat');
+                    $('body').css('background-position', 'center center fixed');
+                    $('body').css('-webkit-background-size', 'cover');
+                    $('body').css('-moz-background-size', 'cover');
+                    $('body').css('-o-background-size', 'cover');
+                    $('body').css('background-size', 'cover');
+                };
 
-					App.prototype.setFullWidthBackground = function(imageUrl) {
-						$('body').css('background-image', 'url(' + imageUrl + ')');
-						$('body').css('background-repeat', 'no-repeat');
-						$('body').css('background-position', 'center center fixed');
-						$('body').css('-webkit-background-size', 'cover');
-						$('body').css('-moz-background-size', 'cover');
-						$('body').css('-o-background-size', 'cover');
-						$('body').css('background-size', 'cover');
-					};
+                App.prototype.refreshWeatherByLatLong = function(location) {
+                    var self = this;
+                    async.waterfall([
 
-					App.prototype.refreshWeatherByWoeId = function(woeid) {
-						var self = this;
-						async.waterfall([
-								function(callback) {
-									$.when(self.yahooData.getWeatherByWoeId(woeid))
-										.then(function(data) {
-											var weather = data.query.results.channel.item;
-											callback(null, weather);
-										});
-								},
+                        function(callback) {
+                            $.when(self.openWeatherApi.CurrentByLatLong(location.lat, location.long))
+                                .then(function(data) {
+                                    console.log(data);
+                                    callback(null, data);
+                                });
+                        },
 
-								function(weather, callback) {
-									self.displayWeather(weather);
-									callback(null, weather);
-								},
+                        function(weather, callback) {
+                            self.displayWeather(weather);
+                            callback(null, weather);
+                        },
 
-								function(weather, callback) {
-									$.when(self.yahooData.getBackgroundImagesWithTextAndTags(weather.forecast[0].text))
-										.then(function(data) {
-											var imageUrls = $.grep(data.query.results.size, function(item) {
-												var lastSix = item.source.slice(-6);
-												return lastSix.indexOf('_') === -1;
-											});
-											var upperBound = imageUrls.length-1;
-											var randomInRange = self.getRandomNumberBetween(0, upperBound);
-											var imageUrl = imageUrls[randomInRange].source;
-											callback(null, imageUrl);
-										});
-								},
+                        function(weather, callback) {
+                            $.when(self.flickrApi.PhotoSearch(weather.weather[0].description))
+                                .then(function(data) {
+                                    console.log(data);
+                                    /*
+                                        s	small square 75x75
+                                        q	large square 150x150
+                                        t	thumbnail, 100 on longest side
+                                        m	small, 240 on longest side
+                                        n	small, 320 on longest side
+                                        -	medium, 500 on longest side
+                                        z	medium 640, 640 on longest side
+                                        c	medium 800, 800 on longest side†
+                                        b	large, 1024 on longest side*
+                                        h	large 1600, 1600 on longest side†
+                                        k	large 2048, 2048 on longest side†
+                                        o	original image, either a jpg, gif or png, depending on source format
+                                    */
+                                    var size = 'b';
+                                    var images = data.photos.photo;
+                                    var upperBound = images.length - 1;
+                                    var randomInRange = self.getRandomNumberBetween(0, upperBound);
+                                    var imageData = images[randomInRange];
+                                    var imageUrl = 'https://farm' + imageData.farm + '.staticflickr.com/' + imageData.server + '/' + imageData.id + '_' + imageData.secret + '_' + size + '.jpg';
+                                    callback(null, imageUrl);
+                                });
+                        },
 
-								function(imageUrl, callback) {
-									self.setFullWidthBackground(imageUrl);
-									callback(null, 'done');
-								}
+                        function(imageUrl, callback) {
+                            self.setFullWidthBackground(imageUrl);
+                            callback(null, 'done');
+                        }
 
-							], function(err, result) {
-								//console.log(err);
-								//console.log(result);
-							});
-					};
+                    ], function(err, result) {
+                        //console.log(err);
+                        //console.log(result);
+                    });
+                };
 
-					App.prototype.refreshWeatherByIpAddress = function() {
-						var self = this;
-						async.waterfall([
-							function(callback) {
-								$.get("http://ipinfo.io", function(response) {
-									var location = response.loc;
-									callback(null, location);
-								},'jsonp');
-							},
+                App.prototype.refreshWeatherByIpAddress = function() {
+                    var self = this;
+                    async.waterfall([
+                        function(callback) {
+                            $.get("http://ipinfo.io", function(response) {
+                                var splitCoords = response.loc.split(',');
+                                var location = {
+                                    'lat': splitCoords[0],
+                                    'long': splitCoords[1]
+                                };
+                                callback(null, location);
+                            }, 'jsonp');
+                        },
 
-							function(location, callback) {
-								$.when(self.yahooData.getLocationFromLatAndLon(location))
-									.then(function(data) {
-										var woeid = data.query.results.Result.woeid;
-										callback(null, woeid);
-									});
-							},
+                        function(location, callback) {
+                            self.refreshWeatherByLatLong(location);
+                            callback(null, 'done');
+                        }
 
-							function(woeid, callback) {
-								self.refreshWeatherByWoeId(woeid);
-								callback(null, 'done');
-							}
+                    ], function(err, result) {
+                        //console.log(err);
+                        //console.log(result);
+                    });
+                };
 
-							], function(err, result) {
-								//console.log(err);
-								//console.log(result);
-							});
-					};
+                App.prototype.refreshWeatherByLocation = function(location) {
+                    var self = this;
+                    async.waterfall([
+                        function(location, callback) {
+                            $.when(self.dataScienceToolkitApi.LocationSearch(location))
+                                .then(function(data) {
+                                    var lat = data.results[0].geometry.location.lat;
+                                    var long = data.results[0].geometry.location.lng;
+                                    var location = {
+                                        'lat': lat,
+                                        'long': long
+                                    }
+                                    callback(null, location);
+                                });
+                        },
 
-					App.prototype.refreshWeatherByLocation = function(location) {
-						var self = this;
-						async.waterfall([
-								function(callback) {
-									$.when(self.yahooData.getWoeIdFromLocation(location))
-										.then(function(data) {
-											var place = data.query.results.place;
-											var woeid = '';
-											if( Object.prototype.toString.call(place) === '[object Array]' ) {
-												woeid = place[0].woeid;
-											} else {
-												woeid = place.woeid;
-											}
-											callback(null, woeid);
-										});
-								},
+                        function(woeid, callback) {
+                            self.refreshWeatherByLatLong(location);
+                            callback(null, 'done');
+                        }
 
-								function(woeid, callback) {
-									self.refreshWeatherByWoeId(woeid);
-									callback(null, 'done');
-								}
+                    ], function(err, result) {
+                        //console.log(err);
+                        //console.log(result);
+                    });
+                };
 
-							], function(err, result) {
-								//console.log(err);
-								//console.log(result);
-							});
-					};
+                App.prototype.bindEvents = function() {
+                    var self = this;
 
-					App.prototype.bindEvents = function() {
-						var self = this;
+                    $('#locationForm').submit(function(e) {
+                        e.preventDefault();
+                        var location = $('#location').val();
+                        if (location) {
+                            self.refreshWeatherByLocation(location);
+                        }
+                    });
 
-						$('#locationForm').submit(function(e) {
-							e.preventDefault();
-							var location = $('#location').val();
-							if(location) {
-								self.refreshWeatherByLocation(location);
-							}
-						});
+                    $('#locationModal').on('hide.bs.modal', function(e) {
+                        var locationInputValue = $('#modalLocationInput').val();
+                        if (locationInputValue) {
+                            self.cookieManager.createCookie('myWeatherApp', locationInputValue, 365);
+                            self.refreshWeatherByLocation(locationInputValue);
+                        } else {
+                            self.refreshWeatherByIpAddress();
+                        }
+                    });
 
-						$('#locationModal').on('hide.bs.modal', function(e) {
-							var locationInputValue = $('#modalLocationInput').val();
-							if(locationInputValue) {
-								self.cookieManager.createCookie('myWeatherApp', locationInputValue, 365);
-								self.refreshWeatherByLocation(locationInputValue);
-							} else {
-								self.refreshWeatherByIpAddress();
-							}
-						});
+                    $('#resetHomeLocationBtn').click(function(e) {
+                        self.cookieManager.deleteCookie('myWeatherApp');
+                        $('#locationModal').modal('show');
+                    });
 
-						$('#resetHomeLocationBtn').click(function(e) {
-							self.cookieManager.deleteCookie('myWeatherApp');
-							$('#locationModal').modal('show');
-						});
+                };
 
-					};
+                App.prototype.init = function() {
+                    this.bindEvents();
+                    var cookieValue = this.cookieManager.getCookie('myWeatherApp');
+                    if (cookieValue) {
+                        this.refreshWeatherByLocation(cookieValue);
+                    } else {
+                        $('#locationModal').modal('show');
+                    }
+                };
 
-					App.prototype.init = function() {
-						this.bindEvents();
-						var cookieValue = this.cookieManager.getCookie('myWeatherApp');
-						if(cookieValue) {
-							this.refreshWeatherByLocation(cookieValue);
-						} else {
-							$('#locationModal').modal('show');
-						}
-					};
+                return App;
+            })();
 
-					return App;
-				})();
+            var flickrApiKey = '429cce0f83cf8b43f51a97d4d26360bb';
+            var openWeatherMapApiKey = 'b6b5e3ce1bc6e096b11b918e7f5f9c02';
+            var cookieManager = new CookieManager();
+            var openWeatherApi = new OpenWeatherApi(openWeatherMapApiKey);
+            var flickrApi = new FlickrApi(flickrApiKey);
+            var dataScienceToolkitApi = new DataScienceToolkitApi();
+            dataScienceToolkitApi.LocationSearch(16066);
+            flickrApi.PhotoSearch('Partly Sunny');
+            openWeatherApi.CurrentByLatLong('40.6120', '-80.0649');
+            var app = new App(openWeatherApi, flickrApi, dataScienceToolkitApi, cookieManager);
+            app.init();
+        });
+    </script>
+</body>
 
-				var yahooBaseYqlUrl = 'https://query.yahooapis.com/v1/public/yql?q=';
-				var flickrApiKey = '429cce0f83cf8b43f51a97d4d26360bb';
-				var yahooData = new YahooData(yahooBaseYqlUrl, flickrApiKey);
-				var cookieManager = new CookieManager();
-				var app = new App(yahooData, cookieManager);
-				app.init();
-			});
-		</script>
-	</body>
 </html>
