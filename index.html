@@ -39,6 +39,12 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="/">Weather Time</a>
             </div>
+            <ul class="nav navbar-nav">
+                <li class="navbar-link">
+                    <a class="nav " id="showAbout" href="#">About</a>
+                </li>
+            </ul>
+
             <div class="navbar-form navbar-right" role="location">
                 <form class="form-group" id="locationForm">
                     <div class="input-group">
@@ -71,6 +77,26 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="aboutModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">About</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Originally used YQL to get location, weather, and a background picture representing the weather, but YQL went down January 2019. Ended up replacing YQL with mapquest api, openweather api, and flickr api. The image is randomly selected
+                        from flickr api using the weather description like "sunny" or "partly cloudy" and I've seen some very bizarre images appear so sorry if that happens to you too! If you like you can check out my webpage: <a href="https://rdlucas.com"
+                            target="_blank">rdlucas.com</a>
+                    </p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 
     <div class="modal fade" id="locationModal">
         <div class="modal-dialog">
@@ -155,11 +181,17 @@
                 function OpenWeatherApi(openWeatherApiKey) {
                     this.openWeatherApiKey = openWeatherApiKey;
                     this.baseUrl = 'https://api.openweathermap.org/data/2.5/';
-                    this.apiSuffix = '&units=imperial&appid=' + this.openWeatherApiKey; //sorry but I'm from USA so forcing imperial here
+                    this.apiSuffix = '&appid=' + this.openWeatherApiKey;
                 }
 
                 OpenWeatherApi.prototype.CurrentByLatLong = function(lat, long) {
-                    var url = this.baseUrl + 'weather?lat=' + lat + '&lon=' + long + this.apiSuffix;
+                    //sorry but I'm from USA so forcing imperial here | TODO: Make units an option
+                    var url = this.baseUrl + 'weather?lat=' + lat + '&lon=' + long + '&units=imperial' + this.apiSuffix;
+                    return $.get(url);
+                }
+
+                OpenWeatherApi.prototype.ForecastByLatLong = function(lat, long) {
+                    var url = this.baseUrl + 'forecast?lat=' + lat + '&lon=' + long + '&units=imperial' + this.apiSuffix;
                     return $.get(url);
                 }
 
@@ -195,9 +227,71 @@
                     return Math.floor(Math.random() * ((upperBound - lowerBound) + 1) + lowerBound);
                 };
 
+                App.prototype.getCardinal = function(angle) {
+                    //easy to customize by changing the number of directions you have 
+                    var directions = 8;
+
+                    var degree = 360 / directions;
+                    angle = angle + degree / 2;
+
+                    if (angle >= 0 * degree && angle < 1 * degree)
+                        return "North";
+                    if (angle >= 1 * degree && angle < 2 * degree)
+                        return "North East";
+                    if (angle >= 2 * degree && angle < 3 * degree)
+                        return "East";
+                    if (angle >= 3 * degree && angle < 4 * degree)
+                        return "South East";
+                    if (angle >= 4 * degree && angle < 5 * degree)
+                        return "South";
+                    if (angle >= 5 * degree && angle < 6 * degree)
+                        return "South West";
+                    if (angle >= 6 * degree && angle < 7 * degree)
+                        return "West";
+                    if (angle >= 7 * degree && angle < 8 * degree)
+                        return "North West";
+
+                    //Should never happen: 
+                    return "?";
+                }
+
+                App.prototype.formatDescription = function(description) {
+                    return description.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+                }
+
+                App.prototype.iconUrl = function(icon) {
+                    return `http://openweathermap.org/img/w/${icon}.png`
+                }
+
+                App.prototype.extendedForecastHtml = function(list) {
+                    var html = '';
+                    for (var i = 0; i < list.length; i++) {
+                        var dt = new Date(list[i].dt * 1000);
+                        html += `                    
+                            <li>
+                                <p>${dt.toDateString()} ${dt.toLocaleTimeString()}</p>
+                                <p>${list[i].main.temp} °F</p>
+                                <p>${this.formatDescription(list[i].weather[0].description)}</p>
+                                <img src="${this.iconUrl(list[i].weather[0].icon)}" />
+                            </li>
+                        `;
+                    }
+                    return html;
+                }
+
                 App.prototype.displayWeather = function(weather) {
-                    $('.title').html(weather.title);
-                    var summary = JSON.stringify(weather);
+                    $('.title').html(weather.name);
+                    //var summary = JSON.stringify(weather);
+                    var description = `${this.formatDescription(weather.weather[0].description)}`;
+                    var extended = this.extendedForecastHtml(weather.forecast.list);
+                    var summary = `
+                        <img src="${this.iconUrl(weather.weather[0].icon)}" />
+                        <h4>Currently ${description} ${weather.main.temp} °F</h4>
+                        <p>Wind is coming in from the ${this.getCardinal(weather.wind.deg)} at ${weather.wind.speed} miles/hour</p>
+                        <h5>Extended 5day/3hr Forecast:</h5>
+                        <ul>
+                            ${extended}
+                        </ul>`;
                     $('.content').html(summary);
                 };
 
@@ -218,8 +312,17 @@
                         function(callback) {
                             $.when(self.openWeatherApi.CurrentByLatLong(location.lat, location.long))
                                 .then(function(data) {
-                                    console.log(data);
+                                    // console.log(data);
                                     callback(null, data);
+                                });
+                        },
+
+                        function(weather, callback) {
+                            $.when(self.openWeatherApi.ForecastByLatLong(location.lat, location.long))
+                                .then(function(data) {
+                                    // console.log(data)
+                                    weather.forecast = data;
+                                    callback(null, weather);
                                 });
                         },
 
@@ -231,7 +334,7 @@
                         function(weather, callback) {
                             $.when(self.flickrApi.PhotoSearch(weather.weather[0].description))
                                 .then(function(data) {
-                                    console.log(data);
+                                    // console.log(data);
                                     /*
                                         s	small square 75x75
                                         q	large square 150x150
@@ -345,6 +448,9 @@
                         $('#locationModal').modal('show');
                     });
 
+                    $('#showAbout').click(function(e) {
+                        $('#aboutModal').modal('show');
+                    });
                 };
 
                 App.prototype.init = function() {
