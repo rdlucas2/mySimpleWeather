@@ -200,11 +200,11 @@
                     var summary = `
                         <img src="${this.iconUrl(weather.weather[0].icon)}" />
                         <h4>Currently ${description} ${weather.main.temp} °F</h4>
-                        <p>Wind is coming in from the ${this.getCardinal(weather.wind.deg)} at ${weather.wind.speed} miles/hour</p>
-                        <h5>Extended 5day/3hr Forecast:</h5>
-                        <ul>
-                            ${extended}
-                        </ul>`;
+                        <p>Wind is coming in from the ${this.getCardinal(weather.wind.deg)} at ${weather.wind.speed} miles/hour</p>`;
+                        //<h5>Extended 5day/3hr Forecast:</h5>
+                        //<ul>
+                        //    ${extended}
+                        //</ul>`;
                     $('.content').html(summary);
                 };
 
