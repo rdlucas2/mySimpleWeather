@@ -1,393 +1,392 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sample Weather App</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-    <style type="text/css">
-        .roundedWithBackground {
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-        }
-        
-        .innerContainer {
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 15px;
-        }
-        
-        .headerPadding {
-            padding: 10px;
-        }
-        
-        .resetBtn {
-            margin-top: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Simple Weather</title>
+<style>
+  :root {
+    --bg: #1b2735;
+    --card: rgba(255,255,255,0.08);
+    --card-border: rgba(255,255,255,0.15);
+    --text: #f4f7fb;
+    --muted: #aab6c4;
+    --accent: #6cb6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(160deg, #0f2027, #203a43, #2c5364);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+  #bg {
+    position: fixed; inset: 0; z-index: -1;
+    background-color: #203a43;
+    background-size: cover; background-position: center;
+    opacity: 0; transition: opacity .6s ease;
+  }
+  #bg.show { opacity: 1; }
+  h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; letter-spacing: .3px; }
+  .sub { color: var(--muted); font-size: .85rem; margin-bottom: 20px; }
+
+  .controls {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    width: 100%; max-width: 520px; margin-bottom: 8px;
+  }
+  input[type="text"] {
+    flex: 1 1 200px; min-width: 0;
+    padding: 12px 14px; border-radius: 12px; border: 1px solid var(--card-border);
+    background: var(--card); color: var(--text); font-size: 1rem; outline: none;
+  }
+  input::placeholder { color: var(--muted); }
+  button {
+    padding: 12px 16px; border-radius: 12px; border: 1px solid var(--card-border);
+    background: var(--card); color: var(--text); font-size: .95rem; cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover { background: rgba(255,255,255,0.16); }
+  .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:24px; }
+  .toggle { font-size: .85rem; color: var(--muted); }
+  .toggle b { color: var(--accent); }
+
+  .status { color: var(--muted); font-size: .95rem; margin: 32px 0; text-align: center; }
+  .status.err { color: #ff9b9b; }
+
+  .current {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 520px;
+    text-align: center; backdrop-filter: blur(8px); margin-bottom: 18px;
+  }
+  .place { font-size: 1.15rem; font-weight: 600; }
+  .obs-time { color: var(--muted); font-size: .8rem; margin-bottom: 10px; }
+  .icon { font-size: 4.5rem; line-height: 1; margin: 6px 0; }
+  .temp { font-size: 3.6rem; font-weight: 700; }
+  .cond { font-size: 1.05rem; color: var(--text); margin-top: 2px; }
+  .meta {
+    display: flex; justify-content: center; gap: 22px; flex-wrap: wrap;
+    margin-top: 18px; color: var(--muted); font-size: .9rem;
+  }
+  .meta span b { color: var(--text); font-weight: 600; }
+
+  .forecast {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
+    gap: 10px; width: 100%; max-width: 520px;
+  }
+  .day {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 14px; padding: 12px 6px; text-align: center;
+  }
+  .day .dow { font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+  .day .dicon { font-size: 1.7rem; }
+  .day .hi { font-weight: 600; font-size: .95rem; margin-top: 4px; }
+  .day .lo { color: var(--muted); font-size: .85rem; }
+  .choices { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 8px; }
+  .choices .hdr { color: var(--muted); font-size: .9rem; margin-bottom: 2px; text-align: center; }
+  .choice {
+    text-align: left; width: 100%; line-height: 1.35;
+    border: 1px solid var(--card-border); background: var(--card); color: var(--text);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .choice b { font-weight: 600; }
+  .choice .sub2 { color: var(--muted); font-size: .82rem; }
+  .img-status {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px; padding: 7px 14px; border-radius: 999px;
+    background: var(--card); border: 1px solid var(--card-border);
+    color: var(--muted); font-size: .82rem;
+  }
+  .img-status[hidden] { display: none; }
+  .spin {
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25); border-top-color: var(--accent);
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  footer { margin-top: 28px; color: var(--muted); font-size: .75rem; text-align:center; line-height: 1.6; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
 </head>
-
 <body>
-    <!-- Static navbar -->
-    <nav class="navbar navbar-default navbar-static-top">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">Weather Time</a>
-            </div>
-            <ul class="nav navbar-nav">
-                <li class="navbar-link">
-                    <a class="nav " id="showAbout" href="#">About</a>
-                </li>
-            </ul>
+  <div id="bg"></div>
+  <h1>My Simple Weather</h1>
+  <div class="sub">Your local weather, or anywhere else, at a glance.</div>
 
-            <div class="navbar-form navbar-right" role="location">
-                <form class="form-group" id="locationForm">
-                    <div class="input-group">
-                        <input type="text" id="location" class="form-control" placeholder="location">
-                        <span class="input-group-btn">
-								<button class="btn btn-default" type="submit">Go!</button>
-							</span>
-                    </div>
-                    <!-- /input-group -->
-            </div>
-            </form>
-        </div>
-    </nav>
+  <form class="controls" id="searchForm">
+    <input type="text" id="q" placeholder="Search a city or ZIP… (e.g. Columbus, OH)" autocomplete="off">
+    <button type="submit">Search</button>
+    <button type="button" id="geoBtn" title="Use my location">📍 My location</button>
+  </form>
+  <div class="toolbar">
+    <button type="button" id="unitBtn" class="toggle">Units: <b id="unitLabel">°F</b></button>
+  </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-6 col-sm-offset-3 text-center">
-                <div class="innerContainer">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="roundedWithBackground">
-                                <h4 class="title text-center headerPadding">
-                                    </h1>
-                                    <div class="content"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button id="resetHomeLocationBtn" class="btn btn-default resetBtn" type="button">Reset Home Location</button>
-            </div>
-        </div>
+  <div id="status" class="status">Getting your location…</div>
+  <div id="result" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>
+  <div id="imgStatus" class="img-status" hidden><span class="spin"></span> Generating image…</div>
+
+  <footer>
+    Weather by <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> ·
+    Location lookup by <a href="https://www.bigdatacloud.com" target="_blank" rel="noopener">BigDataCloud</a> ·
+    AI imagery by <a href="https://pollinations.ai" target="_blank" rel="noopener">Pollinations.AI</a><br>
+    All free services — no API key required.
+  </footer>
+
+<script>
+const WMO = {
+  0:["Clear sky","☀️"],1:["Mainly clear","🌤️"],2:["Partly cloudy","⛅"],3:["Overcast","☁️"],
+  45:["Fog","🌫️"],48:["Rime fog","🌫️"],
+  51:["Light drizzle","🌦️"],53:["Drizzle","🌦️"],55:["Dense drizzle","🌦️"],
+  56:["Freezing drizzle","🌧️"],57:["Freezing drizzle","🌧️"],
+  61:["Light rain","🌧️"],63:["Rain","🌧️"],65:["Heavy rain","🌧️"],
+  66:["Freezing rain","🌧️"],67:["Freezing rain","🌧️"],
+  71:["Light snow","🌨️"],73:["Snow","🌨️"],75:["Heavy snow","❄️"],77:["Snow grains","🌨️"],
+  80:["Light showers","🌦️"],81:["Showers","🌧️"],82:["Violent showers","⛈️"],
+  85:["Snow showers","🌨️"],86:["Snow showers","❄️"],
+  95:["Thunderstorm","⛈️"],96:["Thunderstorm w/ hail","⛈️"],99:["Thunderstorm w/ hail","⛈️"]
+};
+function desc(code){ return WMO[code] || ["—","❓"]; }
+
+// Build an image prompt from the human-readable weather description.
+function photoPrompt(cText, isDay){
+  const time = isDay ? "bright daytime" : "night sky";
+  return cText + " weather, scenic landscape, " + time
+    + ", photorealistic, wide angle, atmospheric, high detail, no text";
+}
+
+// AI-generated backdrop via Pollinations — free, no API key. Each load gets a
+// fresh image matching the conditions (random seed). Falls back silently to the
+// gradient if generation fails or is slow.
+function setBackground(cText, isDay){
+  const bg = document.getElementById("bg");
+  const imgStatus = document.getElementById("imgStatus");
+  bg.classList.remove("show"); // fade out previous while the new one generates
+  imgStatus.hidden = false;    // show "Generating image…" spinner
+  const prompt = encodeURIComponent(photoPrompt(cText, isDay));
+  const seed = Math.floor(Math.random() * 1000000);
+  // Free, no-signup endpoint. (gen.pollinations.ai/image/ requires an API key → 401.)
+  // referrer identifies this web app per Pollinations docs; nologo needs an account, so omitted.
+  const url = "https://image.pollinations.ai/prompt/" + prompt
+    + "?width=1280&height=800&seed=" + seed + "&referrer=mysimpleweather";
+  const img = new Image();
+  img.onload = () => {
+    // overlay keeps the white text readable over any image
+    bg.style.backgroundImage =
+      "linear-gradient(rgba(15,32,39,0.45), rgba(20,40,55,0.78)), url('" + url + "')";
+    bg.classList.add("show");
+    imgStatus.hidden = true;
+  };
+  img.onerror = () => { imgStatus.hidden = true; }; // keep the gradient backdrop on failure
+  img.src = url; // only swap in once the image actually loads
+}
+
+let unit = localStorage.getItem("msw_unit") || "fahrenheit";
+let lastLoc = null; // {lat, lon, name}
+
+const $ = id => document.getElementById(id);
+const statusEl = $("status"), resultEl = $("result");
+
+function setStatus(msg, isErr){
+  statusEl.textContent = msg;
+  statusEl.className = "status" + (isErr ? " err" : "");
+  statusEl.style.display = msg ? "block" : "none";
+}
+function tempUnitSym(){ return unit === "fahrenheit" ? "°F" : "°C"; }
+function windUnit(){ return unit === "fahrenheit" ? "mph" : "km/h"; }
+function windUnitParam(){ return unit === "fahrenheit" ? "mph" : "kmh"; }
+
+$("unitLabel").textContent = tempUnitSym();
+$("unitBtn").addEventListener("click", () => {
+  unit = unit === "fahrenheit" ? "celsius" : "fahrenheit";
+  localStorage.setItem("msw_unit", unit);
+  $("unitLabel").textContent = tempUnitSym();
+  if (lastLoc) loadWeather(lastLoc);
+});
+
+const US_STATES = {
+  al:"alabama",ak:"alaska",az:"arizona",ar:"arkansas",ca:"california",co:"colorado",
+  ct:"connecticut",de:"delaware",fl:"florida",ga:"georgia",hi:"hawaii",id:"idaho",
+  il:"illinois",in:"indiana",ia:"iowa",ks:"kansas",ky:"kentucky",la:"louisiana",
+  me:"maine",md:"maryland",ma:"massachusetts",mi:"michigan",mn:"minnesota",ms:"mississippi",
+  mo:"missouri",mt:"montana",ne:"nebraska",nv:"nevada",nh:"new hampshire",nj:"new jersey",
+  nm:"new mexico",ny:"new york",nc:"north carolina",nd:"north dakota",oh:"ohio",ok:"oklahoma",
+  or:"oregon",pa:"pennsylvania",ri:"rhode island",sc:"south carolina",sd:"south dakota",
+  tn:"tennessee",tx:"texas",ut:"utah",vt:"vermont",va:"virginia",wa:"washington",
+  wv:"west virginia",wi:"wisconsin",wy:"wyoming",dc:"district of columbia"
+};
+
+function fullName(g){ return [g.name, g.admin1, g.country_code].filter(Boolean).join(", "); }
+
+async function fetchGeo(name){
+  const r = await fetch("https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name=" + encodeURIComponent(name));
+  const d = await r.json();
+  return (d && d.results) ? d.results : [];
+}
+
+// Returns { results, hint }. Splits "City, State" / "City State" into a city query
+// plus an optional region/country hint used to filter look-alikes.
+async function geocode(q){
+  const parts = q.split(",").map(s => s.trim()).filter(Boolean);
+  let city = q, hint = "";
+  if (parts.length >= 2){ city = parts[0]; hint = parts.slice(1).join(" "); }
+
+  let results = await fetchGeo(city);
+
+  // No comma, nothing found, multiple words → treat the trailing word as a region hint
+  // (e.g. "Columbus OH" → city "Columbus", hint "OH"). Won't fire for "New York" etc.
+  if (!results.length && !hint){
+    const toks = q.trim().split(/\s+/);
+    if (toks.length > 1){
+      const tryHint = toks[toks.length - 1];
+      const tryCity = toks.slice(0, -1).join(" ");
+      const alt = await fetchGeo(tryCity);
+      if (alt.length){ results = alt; hint = tryHint; }
+    }
+  }
+
+  if (hint && results.length){
+    const h = hint.toLowerCase();
+    const hFull = US_STATES[h] || h;
+    const filtered = results.filter(g => {
+      const blob = [g.admin1, g.admin2, g.country, g.country_code].filter(Boolean).join(" ").toLowerCase();
+      return blob.includes(h) || blob.includes(hFull);
+    });
+    if (filtered.length) results = filtered;
+  }
+  return results;
+}
+
+function showChoices(results){
+  setStatus("");
+  let html = '<div class="hdr">Did you mean…</div>';
+  results.forEach((g, i) => {
+    const line2 = [g.admin1, g.country].filter(Boolean).join(", ");
+    html += '<button class="choice" data-i="' + i + '"><b>' + g.name + '</b>'
+      + (line2 ? '<div class="sub2">' + line2 + '</div>' : '') + '</button>';
+  });
+  resultEl.innerHTML = '<div class="choices">' + html + '</div>';
+  resultEl.querySelectorAll(".choice").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const g = results[+btn.dataset.i];
+      loadWeather({ lat: g.latitude, lon: g.longitude, name: fullName(g) });
+    });
+  });
+}
+
+$("searchForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const q = $("q").value.trim();
+  if (!q) return;
+  setStatus("Searching for “" + q + "”…");
+  resultEl.innerHTML = "";
+  try {
+    const results = await geocode(q);
+    if (!results.length){
+      setStatus("Couldn't find “" + q + "”. Check spelling, or try “City, State” (e.g. Geneva, NY).", true);
+      return;
+    }
+    if (results.length === 1){
+      const g = results[0];
+      loadWeather({ lat: g.latitude, lon: g.longitude, name: fullName(g) });
+    } else {
+      showChoices(results);   // let the user pick the right Geneva
+    }
+  } catch(err){ setStatus("Search failed: " + err.message, true); }
+});
+
+$("geoBtn").addEventListener("click", useGeolocation);
+
+function useGeolocation(){
+  if (!navigator.geolocation){ setStatus("Geolocation isn't supported here. Search for a city instead.", true); return; }
+  setStatus("Getting your location…");
+  navigator.geolocation.getCurrentPosition(
+    pos => loadWeather({ lat: pos.coords.latitude, lon: pos.coords.longitude, name: null }),
+    () => setStatus("Location access denied. Search for a city above.", true),
+    { timeout: 10000 }
+  );
+}
+
+async function reverseName(lat, lon){
+  // BigDataCloud free reverse geocoder — no API key, returns a human-friendly name.
+  try {
+    const r = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en&latitude=" + lat + "&longitude=" + lon);
+    const d = await r.json();
+    const city = d.city || d.locality || d.principalSubdivision;
+    const region = (d.city || d.locality) ? d.principalSubdivision : "";
+    const name = [city, region, d.countryCode].filter(Boolean).join(", ");
+    if (name) return name;
+  } catch(e){}
+  return `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+}
+
+async function loadWeather(loc){
+  lastLoc = loc;
+  setStatus("Loading weather…");
+  resultEl.innerHTML = "";
+  try {
+    const url = "https://api.open-meteo.com/v1/forecast"
+      + "?latitude=" + loc.lat + "&longitude=" + loc.lon
+      + "&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,is_day"
+      + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+      + "&temperature_unit=" + unit
+      + "&wind_speed_unit=" + windUnitParam()
+      + "&timezone=auto&forecast_days=7";
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!d.current){ setStatus("No weather data returned for that location.", true); return; }
+    let name = loc.name;
+    if (!name) name = await reverseName(loc.lat, loc.lon);
+    render(name, d);
+    setStatus("");
+  } catch(err){ setStatus("Couldn't load weather: " + err.message, true); }
+}
+
+function compass(deg){
+  const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+  return dirs[Math.round(deg/45) % 8];
+}
+
+function render(name, d){
+  const c = d.current;
+  const [cText, cIcon] = desc(c.weather_code);
+  setBackground(cText, c.is_day === 1);
+  const u = tempUnitSym();
+  const obs = new Date(c.time).toLocaleString([], {weekday:'short', hour:'numeric', minute:'2-digit'});
+
+  let daysHtml = "";
+  const t = d.daily.time;
+  for (let i = 0; i < t.length; i++){
+    const [, dIcon] = desc(d.daily.weather_code[i]);
+    const dow = i === 0 ? "Today" : new Date(t[i] + "T00:00").toLocaleDateString([], {weekday:'short'});
+    const hi = Math.round(d.daily.temperature_2m_max[i]);
+    const lo = Math.round(d.daily.temperature_2m_min[i]);
+    daysHtml += `<div class="day"><div class="dow">${dow}</div><div class="dicon">${dIcon}</div>`
+      + `<div class="hi">${hi}°</div><div class="lo">${lo}°</div></div>`;
+  }
+
+  resultEl.innerHTML = `
+    <div class="current">
+      <div class="place">${name}</div>
+      <div class="obs-time">As of ${obs}</div>
+      <div class="icon">${cIcon}</div>
+      <div class="temp">${Math.round(c.temperature_2m)}${u}</div>
+      <div class="cond">${cText}</div>
+      <div class="meta">
+        <span>Feels like <b>${Math.round(c.apparent_temperature)}${u}</b></span>
+        <span>Humidity <b>${c.relative_humidity_2m}%</b></span>
+        <span>Wind <b>${Math.round(c.wind_speed_10m)} ${windUnit()} ${compass(c.wind_direction_10m)}</b></span>
+      </div>
     </div>
+    <div class="forecast">${daysHtml}</div>
+  `;
+}
 
-    <div class="modal fade" id="aboutModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">About</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Originally used YQL to get location, weather, and a background picture representing the weather, but YQL went down January 2019. Ended up replacing YQL with mapquest api, openweather api, and flickr api. The image is randomly selected
-                        from flickr api using the weather description like "sunny" or "partly cloudy" and I've seen some very bizarre images appear so sorry if that happens to you too! If you like you can check out my webpage: <a href="https://rdlucas.com"
-                            target="_blank">rdlucas.com</a>
-                    </p>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
-
-    <div class="modal fade" id="locationModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Determine Location</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Set your home location (uses cookies). If you do not enter a location, we'll use your IP address to get as close as we can.</p>
-                    <label>Location:<input type="text" id="modalLocationInput" /></label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Go!</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
-
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.3.0/async.min.js"></script>
-    <script src="https://rdlucas2.github.io/simpleFlickrApi/api.js"></script>
-    <script src="https://rdlucas2.github.io/simpleOpenWeatherApi/api.js"></script>
-    <script src="https://rdlucas2.github.io/simpleMapQuestApi/api.js"></script>
-    <script src="https://rdlucas2.github.io/simpleCookieManager/cookiemanager.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var App = (function() {
-                function App(openWeatherApi, flickrApi, mapQuestApi, cookieManager) {
-                    this.openWeatherApi = openWeatherApi;
-                    this.flickrApi = flickrApi;
-                    this.mapQuestApi = mapQuestApi;
-                    this.cookieManager = cookieManager;
-                }
-
-                App.prototype.getRandomNumberBetween = function(lowerBound, upperBound) {
-                    return Math.floor(Math.random() * ((upperBound - lowerBound) + 1) + lowerBound);
-                };
-
-                App.prototype.getCardinal = function(angle) {
-                    //easy to customize by changing the number of directions you have 
-                    var directions = 8;
-
-                    var degree = 360 / directions;
-                    angle = angle + degree / 2;
-
-                    if (angle >= 0 * degree && angle < 1 * degree)
-                        return "North";
-                    if (angle >= 1 * degree && angle < 2 * degree)
-                        return "North East";
-                    if (angle >= 2 * degree && angle < 3 * degree)
-                        return "East";
-                    if (angle >= 3 * degree && angle < 4 * degree)
-                        return "South East";
-                    if (angle >= 4 * degree && angle < 5 * degree)
-                        return "South";
-                    if (angle >= 5 * degree && angle < 6 * degree)
-                        return "South West";
-                    if (angle >= 6 * degree && angle < 7 * degree)
-                        return "West";
-                    if (angle >= 7 * degree && angle < 8 * degree)
-                        return "North West";
-
-                    //Should never happen: 
-                    return "?";
-                }
-
-                App.prototype.formatDescription = function(description) {
-                    return description.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-                }
-
-                App.prototype.iconUrl = function(icon) {
-                    return `http://openweathermap.org/img/w/${icon}.png`
-                }
-
-		/*
-                App.prototype.extendedForecastHtml = function(list) {
-                    var html = '';
-                    for (var i = 0; i < list.length; i++) {
-                        var dt = new Date(list[i].dt * 1000);
-                        html += `                    
-                            <li>
-                                <p>${dt.toDateString()} ${dt.toLocaleTimeString()}</p>
-                                <p>${list[i].main.temp} °F</p>
-                                <p>${this.formatDescription(list[i].weather[0].description)}</p>
-                                <img src="${this.iconUrl(list[i].weather[0].icon)}" />
-                            </li>
-                        `;
-                    }
-                    return html;
-                }
-		*/
-
-                App.prototype.displayWeather = function(weather) {
-                    $('.title').html(weather.name);
-                    //var summary = JSON.stringify(weather);
-                    var description = `${this.formatDescription(weather.weather[0].description)}`;
-                    //var extended = this.extendedForecastHtml(weather.forecast.list);
-                    var summary = `
-                        <img src="${this.iconUrl(weather.weather[0].icon)}" />
-                        <h4>Currently ${description} ${weather.main.temp} °F</h4>
-                        <p>Wind is coming in from the ${this.getCardinal(weather.wind.deg)} at ${weather.wind.speed} miles/hour</p>`;
-                    $('.content').html(summary);
-                };
-
-                App.prototype.setFullWidthBackground = function(imageUrl) {
-                    $('body').css('background-image', 'url(' + imageUrl + ')');
-                    $('body').css('background-repeat', 'no-repeat');
-                    $('body').css('background-position', 'center center fixed');
-                    $('body').css('-webkit-background-size', 'cover');
-                    $('body').css('-moz-background-size', 'cover');
-                    $('body').css('-o-background-size', 'cover');
-                    $('body').css('background-size', 'cover');
-                };
-
-                App.prototype.refreshWeatherByLatLong = function(location) {
-                    var self = this;
-                    async.waterfall([
-
-                        function(callback) {
-                            $.when(self.openWeatherApi.CurrentByLatLong(location.lat, location.long))
-                                .then(function(data) {
-                                    // console.log(data);
-                                    callback(null, data);
-                                });
-                        },
-
-                        function(weather, callback) {
-                            $.when(self.openWeatherApi.ForecastByLatLong(location.lat, location.long))
-                                .then(function(data) {
-                                    // console.log(data)
-                                    weather.forecast = data;
-                                    callback(null, weather);
-                                });
-                        },
-
-                        function(weather, callback) {
-                            self.displayWeather(weather);
-                            callback(null, weather);
-                        },
-
-                        function(weather, callback) {
-                            $.when(self.flickrApi.PhotoSearch(weather.weather[0].description))
-                                .then(function(data) {
-                                    // console.log(data);
-                                    /*
-                                        s	small square 75x75
-                                        q	large square 150x150
-                                        t	thumbnail, 100 on longest side
-                                        m	small, 240 on longest side
-                                        n	small, 320 on longest side
-                                        -	medium, 500 on longest side
-                                        z	medium 640, 640 on longest side
-                                        c	medium 800, 800 on longest side†
-                                        b	large, 1024 on longest side*
-                                        h	large 1600, 1600 on longest side†
-                                        k	large 2048, 2048 on longest side†
-                                        o	original image, either a jpg, gif or png, depending on source format
-                                    */
-                                    var size = 'b';
-                                    var images = data.photos.photo;
-                                    var upperBound = images.length - 1;
-                                    var randomInRange = self.getRandomNumberBetween(0, upperBound);
-                                    var imageData = images[randomInRange];
-                                    var imageUrl = 'https://farm' + imageData.farm + '.staticflickr.com/' + imageData.server + '/' + imageData.id + '_' + imageData.secret + '_' + size + '.jpg';
-                                    callback(null, imageUrl);
-                                });
-                        },
-
-                        function(imageUrl, callback) {
-                            self.setFullWidthBackground(imageUrl);
-                            callback(null, 'done');
-                        }
-
-                    ], function(err, result) {
-                        //console.log(err);
-                        //console.log(result);
-                    });
-                };
-
-                App.prototype.refreshWeatherByIpAddress = function() {
-                    var self = this;
-                    async.waterfall([
-                        function(callback) {
-                            $.get("https://ipinfo.io", function(response) {
-                                var splitCoords = response.loc.split(',');
-                                var location = {
-                                    'lat': splitCoords[0],
-                                    'long': splitCoords[1]
-                                };
-                                callback(null, location);
-                            }, 'jsonp');
-                        },
-
-                        function(location, callback) {
-                            self.refreshWeatherByLatLong(location);
-                            callback(null, 'done');
-                        }
-
-                    ], function(err, result) {
-                        //console.log(err);
-                        //console.log(result);
-                    });
-                };
-
-                App.prototype.refreshWeatherByLocation = function(location) {
-                    var self = this;
-                    async.waterfall([
-                        function(callback) {
-                            $.when(self.mapQuestApi.Search(location))
-                                .then(function(data) {
-                                    var lat = data.results[0].locations[0].latLng.lat;
-                                    var long = data.results[0].locations[0].latLng.lng;
-                                    var location = {
-                                        'lat': lat,
-                                        'long': long
-                                    }
-                                    callback(null, location);
-                                });
-                        },
-
-                        function(location, callback) {
-                            self.refreshWeatherByLatLong(location);
-                            callback(null, 'done');
-                        }
-
-                    ], function(err, result) {
-                        //console.log(err);
-                        //console.log(result);
-                    });
-                };
-
-                App.prototype.bindEvents = function() {
-                    var self = this;
-
-                    $('#locationForm').submit(function(e) {
-                        e.preventDefault();
-                        var location = $('#location').val();
-                        if (location) {
-                            self.refreshWeatherByLocation(location);
-                        }
-                    });
-
-                    $('#locationModal').on('hide.bs.modal', function(e) {
-                        var locationInputValue = $('#modalLocationInput').val();
-                        if (locationInputValue) {
-                            self.cookieManager.createCookie('myWeatherApp', locationInputValue, 365);
-                            self.refreshWeatherByLocation(locationInputValue);
-                        } else {
-                            self.refreshWeatherByIpAddress();
-                        }
-                    });
-
-                    $('#resetHomeLocationBtn').click(function(e) {
-                        self.cookieManager.deleteCookie('myWeatherApp');
-                        $('#locationModal').modal('show');
-                    });
-
-                    $('#showAbout').click(function(e) {
-                        $('#aboutModal').modal('show');
-                    });
-                };
-
-                App.prototype.init = function() {
-                    this.bindEvents();
-                    var cookieValue = this.cookieManager.getCookie('myWeatherApp');
-                    if (cookieValue) {
-                        this.refreshWeatherByLocation(cookieValue);
-                    } else {
-                        $('#locationModal').modal('show');
-                    }
-                };
-
-                return App;
-            })();
-
-            var flickrApiKey = '429cce0f83cf8b43f51a97d4d26360bb';
-            var openWeatherMapApiKey = 'b6b5e3ce1bc6e096b11b918e7f5f9c02';
-            var mapQuestApiKey = 'fcTfgruXwA1n3QK48RuejddZgOpBlYkr';
-            var cookieManager = new CookieManager();
-            var openWeatherApi = new OpenWeatherApi(openWeatherMapApiKey);
-            var flickrApi = new FlickrApi(flickrApiKey);
-            var mapQuestApi = new MapQuestApi(mapQuestApiKey);
-            var app = new App(openWeatherApi, flickrApi, mapQuestApi, cookieManager);
-            app.init();
-        });
-    </script>
+// Auto-load on first visit
+useGeolocation();
+</script>
 </body>
-
 </html>
